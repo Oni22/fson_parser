@@ -1,3 +1,7 @@
-## [0.0.1] - TODO: Add release date.
+## [0.8.0] - Hotfix
 
-* TODO: Describe initial release.
+* dependecies updated
+
+## [0.8.0] - First release
+
+* first release (Beta)

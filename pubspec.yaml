@@ -1,8 +1,8 @@
 name: fson_parser
 description: A new Flutter package project.
-version: 0.0.1
-author:
-homepage:
+version: 0.8.1
+author: Onur Ozkan <contact@onurozkan.net>
+homepage: https://onurozkan.net
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
