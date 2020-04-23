@@ -1,3 +1,8 @@
+## [0.8.5] - Improvements
+
+* renamed FSONBase to FSONObject
+* declared FSONObject as abstract
+
 ## [0.8.4] - Hotfix
 
 * fixed parser

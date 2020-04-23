@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:path/path.dart' as path;
-import 'package:fson_parser/src/fson_base.dart';
+import 'package:fson_parser/src/fson_object.dart';
 import 'package:fson_parser/src/fson_models.dart';
 import 'package:fson_parser/src/fson_schema.dart';
 import 'package:fson_parser/src/fson_validator.dart';
@@ -9,10 +9,10 @@ class FSON {
 
   final String _projectNamespace = "fson";
 
-  List<FSONNode> parse(String frData) {
+  List<FSONNode> parse(String fson) {
 
     List<FSONNode> fsonModels = [];
-    var idBlocks = frData.split(RegExp(r"\},"));
+    var idBlocks = fson.split(RegExp(r"\},"));
     idBlocks.removeWhere((s) => s.length == 0);
 
     idBlocks.forEach((block) {
@@ -70,9 +70,9 @@ class FSON {
     return fsonModels;
   }
 
-  void buildResource(FSONSchema schema,String namespace, String parentClassName,FSONBase child) async{
+  void buildResource(FSONSchema schema,String namespace, String parentClassName,FSONObject child) async{
 
-    if(child is FSONBase == false) {
+    if(child is FSONObject == false) {
       throw Exception("Membertype doens't extend from FSONBase class!");
     }
 
