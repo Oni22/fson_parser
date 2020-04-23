@@ -48,7 +48,8 @@ class FSON {
           throw FormatException(fsonValidatorText.message + " " + "at id: ${fsonModel.name}");
         }
 
-        if(value.contains(RegExp(r"\[(.*?)\]"))) {
+        //RegExp(r"\[(.*?)\]")
+        if(value.startsWith("[") && value.endsWith("]")) {
           var plurals = value.replaceAll("[", "").replaceAll("]", "").trim().split(",");
           keyValueNode.arrayList = plurals;
         } else {
