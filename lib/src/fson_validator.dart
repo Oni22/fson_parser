@@ -24,7 +24,7 @@ class FSONValidator {
   static FSONValidatorMessage validateText(String text) {
     //RegExp(r"\[(.*?)\]"))
     if(text.startsWith("[") && text.endsWith("]")) {
-      var rawPlurals = text.replaceFirst("[", "").replaceFirst("]", "");
+      var rawPlurals = text.replaceFirst("[", "").replaceFirst("]", "").replaceAll("\n", "").trim();
       if(rawPlurals.contains("[") || rawPlurals.contains("]")) {
         return FSONValidatorMessage(isValid: false, message: "FSON_ERROR: Plurals inside plurals are not allowed!");
       }

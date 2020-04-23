@@ -50,8 +50,8 @@ class FSON {
 
         //RegExp(r"\[(.*?)\]")
         if(value.startsWith("[") && value.endsWith("]")) {
-          var plurals = value.replaceAll("[", "").replaceAll("]", "").trim().split(",");
-          keyValueNode.arrayList = plurals;
+          var arrayValues = value.replaceAll("[", "").replaceAll("]", "").replaceAll("\n","").trim().split(",");
+          keyValueNode.arrayList = arrayValues.map((f) => f.trim()).toList();
         } else {
           keyValueNode.value = value;
         }
