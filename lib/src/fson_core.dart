@@ -69,6 +69,12 @@ class FSON {
     }
 
     var relativePath = path.relative("lib/$namespace/");
+    var dir = Directory(relativePath);
+    if(!dir.existsSync()) { 
+      dir.createSync();
+      return;
+    }
+
     var parseContent = await combineResources(relativePath);
     List<String> currentIds =  [];
 
@@ -134,11 +140,6 @@ class FSON {
 
   Future<String> combineResources(String directoryPath) async {
     var dir = Directory(directoryPath);
-
-    if(!dir.existsSync()) { 
-      dir.createSync();
-    }
-
     var parseContent = "";
     var files = dir.listSync();
 
@@ -161,8 +162,12 @@ class FSON {
   bool isExternalReference(FSONKeyValueNode kv) {
     if(isReference(kv)) {
       var splitted = kv.value.replaceAll("\"#(", "").replaceAll(")\"", "").split(".");
-      if((splitted[0].contains("colors") || splitted[0].contains("styles") || splitted[0].contains("strings")) && splitted.length == 3) {
-        return true;
+      if(splitted.length == 3) {
+        var dir = Directory("lib/${splitted[0]}");
+        if(dir.existsSync()) {
+          return true;
+        }
+        throw FormatException("FSON_ERROR: The ${splitted[0]} namespace doesn't exitst!");
       } else {
         return false;
       }
