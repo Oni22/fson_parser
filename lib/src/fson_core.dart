@@ -100,21 +100,9 @@ class FSON {
         currentIds.add(fson.name);
       }
 
-      if((schema?.requiredKeys?.length ?? 0) < 1 && (schema?.keys?.length ?? 0) < 1) {
-        throw FormatException("Required keys and optional keys shouldn't be null or empty at the same time. Use at least one of these to specify keys for your schema");
-      }
-
       if((fson.keyValueNodes?.length ?? 0) < 1) throw FormatException("Please add keys to FSONNode! At ${fson.name}"); 
 
-      schema.requiredKeys?.forEach((k) {
-          if(fson.keyValueNodes.any((f) => f.key == k) == false)
-            throw FormatException("Key $k is required! At ${fson.name}!");
-      });
-  
-      fson.keyValueNodes.forEach((kv) {
-          if(schema.keys?.contains(kv.key) == false)
-            throw FormatException("Key ${kv.key} not supported! At ${fson.name}!");
-      });
+      schema.validate(fson);
 
       Map<String,dynamic> map = {};
 
