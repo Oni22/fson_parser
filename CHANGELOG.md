@@ -1,3 +1,7 @@
+## [0.8.4] - Hotfix
+
+* fixed parser
+
 ## [0.8.3] - Hotfix
 
 * fixed parser
