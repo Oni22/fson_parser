@@ -7,9 +7,9 @@ import 'package:fson_parser/src/fson_validator.dart';
 
 class FSON {
 
-  static const String _projectNamespace = "fson";
+  final String _projectNamespace = "fson";
 
-    List<FSONNode> parse(String frData) {
+  List<FSONNode> parse(String frData) {
 
     List<FSONNode> fsonModels = [];
     var idBlocks = frData.split(RegExp(r"\},"));
