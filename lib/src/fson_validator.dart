@@ -22,19 +22,21 @@ class FSONValidator {
   }
 
   static FSONValidatorMessage validateText(String text) {
-    //RegExp(r"\[(.*?)\]"))
+    // \[((.|\n)*?)\] multiline
+    // \[(.*?)\] singleline
     if(text.startsWith("[") && text.endsWith("]")) {
-      var rawPlurals = text.replaceFirst("[", "").replaceFirst("]", "").replaceAll("\n", "").trim();
-      if(rawPlurals.contains("[") || rawPlurals.contains("]")) {
+      var arrayValues = text.replaceFirst("[", "").replaceFirst("]", "").replaceAll("\n","").trim();
+      if(arrayValues.contains("[") || arrayValues.contains("]")) {
         return FSONValidatorMessage(isValid: false, message: "FSON_ERROR: Plurals inside plurals are not allowed!");
       }
-      var validatedPlurals = rawPlurals.trim().split(",");
+      var validatedArray = arrayValues.trim().split(",");
       //"[^"]*"
-      for(var p in validatedPlurals) {
-        if(!p.startsWith("\"") || !p.endsWith("\"")) {
+      for(var value in validatedArray) {
+        var trimmedValue = value.trim();
+        if(!trimmedValue.startsWith("\"") || !trimmedValue.endsWith("\"")) {
           return FSONValidatorMessage(isValid: false, message: "FSON_ERROR: Text must be a string!");
         } else {
-          var r = p.replaceAll(RegExp(r"^.|.$"),"");
+          var r = trimmedValue.replaceAll(RegExp(r"^.|.$"),"");
           if(r.contains("\"")) { //NOT FINAL
             return FSONValidatorMessage(isValid: false,message:"FSON_ERROR: Please escape with \\""\" inside a string");
           }    

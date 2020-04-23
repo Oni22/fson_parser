@@ -9,14 +9,14 @@ class FSON {
 
   static const String _projectNamespace = "fson";
 
-  List<FSONNode> parse(String frData) {
+    List<FSONNode> parse(String frData) {
 
     List<FSONNode> fsonModels = [];
-
     var idBlocks = frData.split(RegExp(r"\},"));
     idBlocks.removeWhere((s) => s.length == 0);
 
     idBlocks.forEach((block) {
+      
       var idAndKeyValuePairs = block.split(RegExp(r"\{"));
       var fsonModel = FSONNode(
         name: idAndKeyValuePairs[0].trim(),
@@ -26,16 +26,20 @@ class FSON {
 
       var fsonValidatorId = FSONValidator.validateStringId(fsonModel.name);
       if(!fsonValidatorId.isValid) {
+         print("ID");
         throw FormatException(fsonValidatorId.message + " " + "at id: ${fsonModel.name}");
       }
 
+      //REGEX: Match only commas outside of array
       keyValuePair.replaceAll("}","").trim().split(RegExp(r"(,)(?![^[]*\])")).forEach((keyValueRaw) {
+
         var keyValue = keyValueRaw.split(":");
         var key = keyValue[0].trim();
         var value = keyValue[1].trim();
 
         var keyValidator = FSONValidator.validateKey(key);
         if(!keyValidator.isValid) {
+          print("KEY");
           throw FormatException(fsonValidatorId.message + " " + "at id: ${fsonModel.name}");
         }
 
@@ -45,12 +49,15 @@ class FSON {
 
         var fsonValidatorText = FSONValidator.validateText(value);
         if(!fsonValidatorText.isValid) {
+          print("TEXT");
           throw FormatException(fsonValidatorText.message + " " + "at id: ${fsonModel.name}");
         }
 
+        //Is array?
         //RegExp(r"\[(.*?)\]")
         if(value.startsWith("[") && value.endsWith("]")) {
           var arrayValues = value.replaceAll("[", "").replaceAll("]", "").replaceAll("\n","").trim().split(",");
+          print(arrayValues.toString());
           keyValueNode.arrayList = arrayValues.map((f) => f.trim()).toList();
         } else {
           keyValueNode.value = value;
