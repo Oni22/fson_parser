@@ -140,7 +140,7 @@ class FSON {
 
   }
 
-  Future<String> toDart(String content,FSONSchema schema, String parentClassName) async{
+  Future<String> toDart(String content,FSONSchema schema, String parentClassName,FSONBase child) async{
 
     if(child is FSONBase == false) {
       throw Exception("Membertype doens't extend from FSONBase class!");
@@ -188,7 +188,7 @@ class FSON {
           map["\"${kv.key}\""] = kv.value;
         }                 
       }
-      finalContent += "\tstatic $parentClassName ${fson.name} = $parentClassName(map: ${map.toString()} ,name: \"${fson.name}\");\n";
+      finalContent += "\tstatic ${child.runtimeType} ${fson.name} = ${child.runtimeType}(map: ${map.toString()} ,name: \"${fson.name}\");\n";
     }
 
     finalContent += "}";
