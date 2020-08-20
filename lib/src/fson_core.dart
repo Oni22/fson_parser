@@ -70,6 +70,7 @@ class FSON {
     return fsonModels;
   }
 
+  @Deprecated('migration')
   void buildResource(FSONSchema schema,String namespace, String parentClassName,FSONBase child) async{
 
     if(child is FSONBase == false) {
@@ -138,6 +139,77 @@ class FSON {
     File(relativePath + "/$namespace.fson.dart").writeAsString(finalContent);
 
   }
+
+  Future<String> toDart(FSONSchema schema,String namespace, String parentClassName,FSONBase child) async{
+
+    if(child is FSONBase == false) {
+      throw Exception("Membertype doens't extend from FSONBase class!");
+    }
+
+    var relativePath = path.relative("lib/$namespace/");
+    var dir = Directory(relativePath);
+    if(!dir.existsSync()) { 
+      dir.createSync();
+      return "";
+    }
+
+    var parseContent = await combineResources(relativePath);
+    List<String> currentIds =  [];
+
+    String finalContent = "import 'package:$_projectNamespace/$_projectNamespace.dart';\nclass $parentClassName {\n";
+    var fsons = FSON().parse(parseContent);
+    for(var fson in fsons) {
+      
+      if(schema.fsonCustomValidate != null) {
+        schema.fsonCustomValidate(fson);
+      }
+
+      if(currentIds.contains(fson.name)) {
+        throw FormatException("Id already exists! at id: ${fson.name}");
+      } else {
+        currentIds.add(fson.name);
+      }
+
+      if((schema?.requiredKeys?.length ?? 0) < 1 && (schema?.keys?.length ?? 0) < 1) {
+        throw FormatException("Required keys and optional keys shouldn't be null or empty at the same time. Use at least one of these to specify keys for your schema");
+      }
+
+      if((fson.keyValueNodes?.length ?? 0) < 1) throw FormatException("Please add keys to FSONNode! At ${fson.name}"); 
+
+      schema.requiredKeys?.forEach((k) {
+          if(fson.keyValueNodes.any((f) => f.key == k) == false)
+            throw FormatException("Key $k is required! At ${fson.name}!");
+      });
+  
+      fson.keyValueNodes.forEach((kv) {
+          if(schema.keys?.contains(kv.key) == false)
+            throw FormatException("Key ${kv.key} not supported! At ${fson.name}!");
+      });
+
+      Map<String,dynamic> map = {};
+
+      for(var kv in fson.keyValueNodes) {
+        if(isReference(kv)) {
+          var value = await fetchReference(kv);
+          map["\"${kv.key}\""] = value ?? "";
+        } else {
+          if(kv.arrayList.length > 0) {
+          map["\"${kv.key}\""] = kv.arrayList;
+          } 
+          else {
+            map["\"${kv.key}\""] = kv.value;
+          }
+        }                 
+      }
+      finalContent += "\tstatic ${child.runtimeType} ${fson.name} = ${child.runtimeType}(map: ${map.toString()} ,name: \"${fson.name}\");\n";
+    }
+
+    finalContent += "}";
+    return finalContent;
+
+  }
+
+
 
   Future<FSONKeyValueNode> loadKeyValueNode(String resourceId, String id, String key) async {
     var relativePath = path.relative("lib/$resourceId/");
