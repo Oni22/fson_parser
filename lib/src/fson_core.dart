@@ -140,24 +140,16 @@ class FSON {
 
   }
 
-  Future<String> toDart(FSONSchema schema,String namespace, String parentClassName,FSONBase child) async{
+  Future<String> toDart(String content,FSONSchema schema, String parentClassName) async{
 
     if(child is FSONBase == false) {
       throw Exception("Membertype doens't extend from FSONBase class!");
     }
 
-    var relativePath = path.relative("lib/$namespace/");
-    var dir = Directory(relativePath);
-    if(!dir.existsSync()) { 
-      dir.createSync();
-      return "";
-    }
-
-    var parseContent = await combineResources(relativePath);
     List<String> currentIds =  [];
 
     String finalContent = "import 'package:$_projectNamespace/$_projectNamespace.dart';\nclass $parentClassName {\n";
-    var fsons = FSON().parse(parseContent);
+    var fsons = FSON().parse(content);
     for(var fson in fsons) {
       
       if(schema.fsonCustomValidate != null) {
@@ -189,19 +181,14 @@ class FSON {
       Map<String,dynamic> map = {};
 
       for(var kv in fson.keyValueNodes) {
-        if(isReference(kv)) {
-          var value = await fetchReference(kv);
-          map["\"${kv.key}\""] = value ?? "";
-        } else {
-          if(kv.arrayList.length > 0) {
+        if(kv.arrayList.length > 0) {
           map["\"${kv.key}\""] = kv.arrayList;
-          } 
-          else {
-            map["\"${kv.key}\""] = kv.value;
-          }
+        } 
+        else {
+          map["\"${kv.key}\""] = kv.value;
         }                 
       }
-      finalContent += "\tstatic ${child.runtimeType} ${fson.name} = ${child.runtimeType}(map: ${map.toString()} ,name: \"${fson.name}\");\n";
+      finalContent += "\tstatic $parentClassName ${fson.name} = $parentClassName(map: ${map.toString()} ,name: \"${fson.name}\");\n";
     }
 
     finalContent += "}";
